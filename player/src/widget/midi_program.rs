@@ -46,15 +46,15 @@ impl<Message> canvas::Program<Message> for MidiProgram {
 
     fn draw(
         &self,
-        state: &Self::State,
+        _state: &Self::State,
         renderer: &Renderer,
-        theme: &iced_renderer::core::Theme,
+        _theme: &iced_renderer::core::Theme,
         bounds: iced::Rectangle,
-        cursor: iced_renderer::core::mouse::Cursor,
+        _cursor: iced_renderer::core::mouse::Cursor,
     ) -> Vec<canvas::Geometry<Renderer>> {
         let mut frame = canvas::Frame::new(renderer, bounds.size());
 
-        self.draw_header(&mut frame);
+        //self.draw_header(&mut frame);
 
         self.midi_file.tracks[1].notes.iter().for_each(|note| {
             self.draw_note(note, &mut frame);

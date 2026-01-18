@@ -1,7 +1,7 @@
 use iced::{
     Element,
     widget::{
-        canvas, scrollable,
+        canvas, row, scrollable,
         scrollable::{Direction, Scrollbar},
     },
 };
@@ -10,6 +10,7 @@ mod screen;
 mod widget;
 
 use crate::widget::MidiProgram;
+use crate::widget::NoteHeaderProgram;
 
 struct App {}
 
@@ -20,17 +21,25 @@ impl App {
         App {}
     }
 
-    fn update(&mut self, message: Message) {}
+    fn update(&mut self, _message: Message) {}
 
     fn view(&self) -> Element<'_, Message> {
-        let midi_program = MidiProgram::new();
-        let canvas = canvas(midi_program).width(3000).height(3000);
+        let note_header_canvas = self.view_note_header_canvas();
+        let midi_canvas = self.view_midi_canvas();
 
-        scrollable(canvas)
-            .direction(Direction::Both {
-                vertical: Scrollbar::default(),
-                horizontal: Scrollbar::default(),
-            })
+        scrollable(row![note_header_canvas, midi_canvas,]).into()
+    }
+
+    fn view_midi_canvas(&self) -> Element<'_, Message> {
+        scrollable(canvas(MidiProgram::new()).width(3000).height(2580))
+            .horizontal()
+            .into()
+    }
+
+    fn view_note_header_canvas(&self) -> Element<'_, Message> {
+        canvas(NoteHeaderProgram::new())
+            .width(50)
+            .height(2580)
             .into()
     }
 }

@@ -2,7 +2,7 @@ use iced::{Point, Rectangle, Renderer, Theme, mouse::Cursor, widget::canvas};
 
 const NUM_MIDI_NOTES: u8 = 128;
 const NOTE_WIDTH: u8 = 10;
-const NOTE_HEIGHT: u8 = 20;
+const NOTE_HEIGHT: u8 = 30;
 
 pub struct NoteHeaderProgram {}
 

@@ -1,9 +1,6 @@
 use iced::{
     Element,
-    widget::{
-        canvas, row, scrollable,
-        scrollable::{Direction, Scrollbar},
-    },
+    widget::{canvas, row, scrollable},
 };
 
 mod screen;
@@ -31,7 +28,7 @@ impl App {
     }
 
     fn view_midi_canvas(&self) -> Element<'_, Message> {
-        scrollable(canvas(MidiProgram::new()).width(3000).height(2580))
+        scrollable(canvas(MidiProgram::new()).width(3000).height(3200))
             .horizontal()
             .into()
     }
@@ -39,7 +36,7 @@ impl App {
     fn view_note_header_canvas(&self) -> Element<'_, Message> {
         canvas(NoteHeaderProgram::new())
             .width(50)
-            .height(2580)
+            .height(3200)
             .into()
     }
 }

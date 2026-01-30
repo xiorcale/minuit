@@ -1,3 +1,4 @@
+#[derive(Debug, Clone, Copy)]
 pub struct Note {
     pub key: u8,
     pub velocity: u8,

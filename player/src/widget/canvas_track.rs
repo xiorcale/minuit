@@ -2,24 +2,23 @@ use iced::{
     Color, Renderer, border,
     widget::canvas::{self, Frame},
 };
+use iced_renderer::geometry::Stroke;
+use midi::Track;
 
-const NUM_MIDI_NOTES: f32 = 128.0;
-const NOTE_WIDTH: f32 = 10.0;
-const NOTE_HEIGHT: f32 = 30.0;
+use crate::widget::canvas_config::{NOTE_HEIGHT, NOTE_WIDTH, NUM_MIDI_NOTES};
 
-pub struct MidiProgram {
-    pub midi_file: midi::File,
+pub struct CanvasTrack {
+    track: midi::Track,
 }
 
-impl MidiProgram {
-    pub fn new() -> Self {
-        let file = midi::File::new();
-        MidiProgram { midi_file: file }
+impl CanvasTrack {
+    pub fn new(track: Track) -> Self {
+        CanvasTrack { track: track }
     }
 
     fn draw_note(&self, note: &midi::Note, frame: &mut Frame<Renderer>) {
         let x = (note.start_time as f32 / NOTE_WIDTH) as f32;
-        let y = (NUM_MIDI_NOTES - note.key as f32) * NOTE_HEIGHT - (NOTE_HEIGHT / 2.0);
+        let y = (NUM_MIDI_NOTES - note.key as f32) * NOTE_HEIGHT;
 
         let top_left = iced::Point::new(x, y);
         let size = iced::Size::new(note.duration as f32 / NOTE_WIDTH, NOTE_HEIGHT);
@@ -28,9 +27,22 @@ impl MidiProgram {
 
         frame.fill(&note_rectangle, Color::BLACK);
     }
+
+    fn draw_lines(&self, frame: &mut Frame<Renderer>) {
+        for key in (0..=NUM_MIDI_NOTES as i32).rev() {
+            let y = (NUM_MIDI_NOTES - key as f32) as f32 * NOTE_HEIGHT;
+
+            let start_point = iced::Point::new(0.0, y);
+            let end_point = iced::Point::new(frame.width(), y);
+
+            let line = canvas::Path::line(start_point, end_point);
+
+            frame.stroke(&line, Stroke::default().with_color(Color::BLACK));
+        }
+    }
 }
 
-impl<Message> canvas::Program<Message> for MidiProgram {
+impl<Message> canvas::Program<Message> for CanvasTrack {
     type State = ();
 
     fn draw(
@@ -43,7 +55,9 @@ impl<Message> canvas::Program<Message> for MidiProgram {
     ) -> Vec<canvas::Geometry<Renderer>> {
         let mut frame = canvas::Frame::new(renderer, bounds.size());
 
-        self.midi_file.tracks[1].notes.iter().for_each(|note| {
+        self.draw_lines(&mut frame);
+
+        self.track.notes.iter().for_each(|note| {
             self.draw_note(note, &mut frame);
         });
 

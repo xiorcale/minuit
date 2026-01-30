@@ -14,14 +14,14 @@ pub struct File {
 }
 
 impl File {
-    pub fn new() -> Self {
+    pub fn new(filepath: String) -> Self {
         let mut file = File {
             tracks: vec![],
             tempo: 0,
             bpm: 0,
         };
 
-        file.parse_file("./test.mid");
+        file.parse_file(filepath.as_str());
         file.build_notes();
 
         file

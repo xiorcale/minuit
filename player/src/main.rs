@@ -1,43 +1,35 @@
-use iced::{
-    Element,
-    widget::{canvas, row, scrollable},
-};
+use iced::Element;
 
 mod screen;
 mod widget;
 
-use crate::widget::MidiProgram;
-use crate::widget::NoteHeaderProgram;
+use crate::screen::Player;
+use crate::screen::player;
 
-struct App {}
+struct App {
+    player: Player,
+}
 
-struct Message {}
+#[derive(Debug, Clone)]
+enum Message {
+    PlayerMessage(player::Message),
+}
 
 impl App {
     fn new() -> Self {
-        App {}
+        App {
+            player: Player::new(),
+        }
     }
 
-    fn update(&mut self, _message: Message) {}
+    fn update(&mut self, message: Message) {
+        match message {
+            Message::PlayerMessage(msg) => self.player.update(msg),
+        };
+    }
 
     fn view(&self) -> Element<'_, Message> {
-        let note_header_canvas = self.view_note_header_canvas();
-        let midi_canvas = self.view_midi_canvas();
-
-        scrollable(row![note_header_canvas, midi_canvas,]).into()
-    }
-
-    fn view_midi_canvas(&self) -> Element<'_, Message> {
-        scrollable(canvas(MidiProgram::new()).width(3000).height(3200))
-            .horizontal()
-            .into()
-    }
-
-    fn view_note_header_canvas(&self) -> Element<'_, Message> {
-        canvas(NoteHeaderProgram::new())
-            .width(50)
-            .height(3200)
-            .into()
+        self.player.view().map(|msg| Message::PlayerMessage(msg))
     }
 }
 

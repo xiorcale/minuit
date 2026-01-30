@@ -1,6 +1,7 @@
 use crate::model::Event;
 use crate::model::Note;
 
+#[derive(Debug, Clone)]
 pub struct Track {
     pub name: String,
     pub instrument: String,

@@ -74,7 +74,7 @@ impl TryFrom<u8> for MetaEventKind {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub struct Event {
     pub kind: EventKind,
     pub key: u8,

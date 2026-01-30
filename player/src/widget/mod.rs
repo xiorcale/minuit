@@ -1,7 +1,7 @@
 mod canvas_config;
 
-pub mod canvas_track;
-pub mod note_header_program;
+pub mod piano_roll_renderer;
+pub mod track_renderer;
 
-pub use canvas_track::*;
-pub use note_header_program::*;
+pub use piano_roll_renderer::*;
+pub use track_renderer::*;

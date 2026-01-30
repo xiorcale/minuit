@@ -5,15 +5,15 @@ const NUM_MIDI_NOTES: u8 = 127;
 const NOTE_WIDTH: u8 = 10;
 const NOTE_HEIGHT: u8 = 25;
 
-pub struct NoteHeaderProgram {}
+pub struct PianoRollRenderer {}
 
-impl NoteHeaderProgram {
+impl PianoRollRenderer {
     pub fn new() -> Self {
-        NoteHeaderProgram {}
+        PianoRollRenderer {}
     }
 }
 
-impl<Message> canvas::Program<Message> for NoteHeaderProgram {
+impl<Message> canvas::Program<Message> for PianoRollRenderer {
     type State = ();
 
     fn draw(
@@ -43,7 +43,7 @@ impl<Message> canvas::Program<Message> for NoteHeaderProgram {
             frame.stroke_rectangle(
                 Point::new(0.0, y),
                 Size::new(bounds.size().width, NOTE_HEIGHT.into()),
-                Stroke::default(),
+                Stroke::default().with_width(0.25),
             );
         }
 

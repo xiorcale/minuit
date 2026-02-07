@@ -1,4 +1,5 @@
 use iced::Element;
+use iced::Task;
 
 mod screen;
 mod widget;
@@ -22,10 +23,13 @@ impl App {
         }
     }
 
-    fn update(&mut self, message: Message) {
+    fn update(&mut self, message: Message) -> Task<Message> {
         match message {
-            Message::PlayerMessage(msg) => self.player.update(msg),
-        };
+            Message::PlayerMessage(msg) => self
+                .player
+                .update(msg)
+                .map(|msg| Message::PlayerMessage(msg)),
+        }
     }
 
     fn view(&self) -> Element<'_, Message> {

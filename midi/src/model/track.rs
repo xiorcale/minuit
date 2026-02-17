@@ -18,8 +18,8 @@ impl Track {
             instrument: "".to_string(),
             events: vec![],
             notes: vec![],
-            max_note: 64,
-            min_note: 64,
+            max_note: 0,
+            min_note: 127,
         }
     }
 
@@ -29,5 +29,10 @@ impl Track {
 
     pub fn set_instrument(&mut self, instrument: String) {
         self.instrument = instrument;
+    }
+
+    pub fn note_range(&self) -> u8 {
+        // +1 for including both notes in the range
+        self.max_note - self.min_note + 1
     }
 }

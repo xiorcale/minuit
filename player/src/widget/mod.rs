@@ -1,4 +1,4 @@
-mod canvas_config;
+pub mod canvas_config;
 
 pub mod piano_roll_renderer;
 pub mod track_renderer;

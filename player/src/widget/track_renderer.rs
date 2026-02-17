@@ -16,8 +16,10 @@ impl<'a> TrackRenderer<'a> {
     }
 
     fn draw_note(&self, note: &midi::Note, frame: &mut Frame<Renderer>) {
+        let num_notes = self.track.max_note - self.track.min_note + 1;
+
         let x = (note.start_time as f32 / NOTE_WIDTH) as f32;
-        let y = (NUM_MIDI_NOTES - note.key as f32) * NOTE_HEIGHT;
+        let y = (num_notes as f32 - (note.key - self.track.min_note) as f32) * NOTE_HEIGHT;
 
         let top_left = iced::Point::new(x, y);
         let size = iced::Size::new(note.duration as f32 / NOTE_WIDTH, NOTE_HEIGHT);
@@ -28,8 +30,10 @@ impl<'a> TrackRenderer<'a> {
     }
 
     fn draw_lines(&self, frame: &mut Frame<Renderer>) {
-        for key in (-1..=NUM_MIDI_NOTES as i32).rev() {
-            let y = (NUM_MIDI_NOTES - key as f32) as f32 * NOTE_HEIGHT;
+        let num_notes = self.track.max_note - self.track.min_note + 1;
+
+        for current_note in (-1..=num_notes as i32).rev() {
+            let y = (num_notes as f32 - current_note as f32) as f32 * NOTE_HEIGHT;
 
             let start_point = iced::Point::new(0.0, y);
             let end_point = iced::Point::new(frame.width(), y);

@@ -1,6 +1,9 @@
+use crate::widget::canvas_config::{NOTE_HEIGHT, NOTE_WIDTH, NUM_MIDI_NOTES};
+use crate::widget::{self, PianoRollRenderer, TrackRenderer};
+use iced::widget::{center, container};
 use iced::{
     Element,
-    Length::Fill,
+    Length::{self, Fill},
     Task,
     widget::{
         Id, Scrollable, Space, button, canvas, column,
@@ -9,8 +12,6 @@ use iced::{
         scrollable::{Direction, Scrollbar, Viewport},
     },
 };
-
-use crate::widget::{self, PianoRollRenderer, TrackRenderer};
 
 const PIANO_ROLL_ID: &str = "piano_roll";
 const TRACK_RENDERER_ID: &str = "track_renderer";
@@ -57,36 +58,52 @@ impl Player {
 
     pub fn view(&self) -> Element<'_, Message> {
         if let Some(ref midi_file) = self.midi_file {
-            let piano_roll_renderer = PianoRollRenderer::new();
-            let track_renderer = TrackRenderer::new(&midi_file.tracks[1]);
+            let piano_roll_renderer = PianoRollRenderer::new(&midi_file.tracks[1]);
+            // let track_renderer = TrackRenderer::new(&midi_file.tracks[1]);
 
-            let canvas_header = Scrollable::new(canvas(piano_roll_renderer).width(50).height(3500))
-                .id(PIANO_ROLL_ID)
-                .direction(Direction::Vertical(Scrollbar::hidden()))
-                .on_scroll(Message::PianoRollScroll);
+            let (canvas_width, canvas_height) = self.get_canvas_dimension().unwrap();
 
-            let track_canvas = Scrollable::new(canvas(track_renderer).width(3000).height(3500))
-                .id(TRACK_RENDERER_ID)
-                .direction(Direction::Both {
-                    vertical: Scrollbar::new(),
-                    horizontal: Scrollbar::new(),
-                })
-                .on_scroll(Message::TrackScroll);
+            let canvas_header =
+                Scrollable::new(canvas(piano_roll_renderer).width(50).height(canvas_height))
+                    .id(PIANO_ROLL_ID)
+                    .direction(Direction::Vertical(Scrollbar::hidden()))
+                    .on_scroll(Message::PianoRollScroll);
 
-            row![canvas_header, track_canvas].into()
+            // let track_canvas = Scrollable::new(
+            //     canvas(track_renderer)
+            //         .width(canvas_width)
+            //         .height(canvas_height),
+            // )
+            // .id(TRACK_RENDERER_ID)
+            // .direction(Direction::Both {
+            //     vertical: Scrollbar::new(),
+            //     horizontal: Scrollbar::new(),
+            // })
+            // .on_scroll(Message::TrackScroll);
+
+            row![container(canvas_header).padding(10) /*track_canvas*/,].into()
         } else {
             let open_file =
                 button("click to load file").on_press(Message::OpenFile("./test.mid".to_string()));
 
-            let v_fill = Space::default().height(Fill);
-            let h_fill = Space::default().width(Fill);
+            return center(open_file).into();
+        }
+    }
 
-            return column![
-                v_fill,
-                row![h_fill, open_file, Space::default().width(Fill)],
-                Space::default().height(Fill)
-            ]
-            .into();
+    fn get_canvas_dimension(&self) -> Option<(u32, u32)> {
+        if let Some(ref midi_file) = self.midi_file {
+            let track = &midi_file.tracks[1];
+
+            let total_time = track.notes.last()?.start_time + track.notes.last()?.duration;
+
+            let width = total_time / (NOTE_WIDTH as u32);
+            let height = track.note_range() as u32 * (NOTE_HEIGHT as u32);
+
+            println!("track len: {}", total_time);
+
+            Some((width, height))
+        } else {
+            None
         }
     }
 }

@@ -1,19 +1,19 @@
 use iced::{Point, Rectangle, Renderer, Size, Theme, mouse::Cursor, widget::canvas};
-use iced_renderer::geometry::Stroke;
+use iced_renderer::geometry::{Path, Stroke};
 
-const NUM_MIDI_NOTES: u8 = 127;
-const NOTE_WIDTH: u8 = 10;
-const NOTE_HEIGHT: u8 = 25;
+use crate::widget::canvas_config::{NOTE_HEIGHT, NOTE_WIDTH};
 
-pub struct PianoRollRenderer {}
+pub struct PianoRollRenderer<'a> {
+    track: &'a midi::Track,
+}
 
-impl PianoRollRenderer {
-    pub fn new() -> Self {
-        PianoRollRenderer {}
+impl<'a> PianoRollRenderer<'a> {
+    pub fn new(track: &'a midi::Track) -> Self {
+        PianoRollRenderer { track }
     }
 }
 
-impl<Message> canvas::Program<Message> for PianoRollRenderer {
+impl<'a, Message> canvas::Program<Message> for PianoRollRenderer<'a> {
     type State = ();
 
     fn draw(
@@ -26,14 +26,17 @@ impl<Message> canvas::Program<Message> for PianoRollRenderer {
     ) -> Vec<canvas::Geometry<Renderer>> {
         let mut frame = canvas::Frame::new(renderer, bounds.size());
 
-        for key in (0..=NUM_MIDI_NOTES).rev() {
+        for (i, key) in (self.track.min_note..=self.track.max_note)
+            .rev()
+            .enumerate()
+        {
             let note_name = midi::Note::name_from_key(key);
 
-            let y = (NUM_MIDI_NOTES - key) as f32 * NOTE_HEIGHT as f32;
+            let y = i as f32 * NOTE_HEIGHT;
 
             let note_text = canvas::Text {
                 content: note_name,
-                position: Point::new(NOTE_WIDTH.into(), y + NOTE_HEIGHT as f32 / 2.0),
+                position: Point::new(NOTE_WIDTH, y + NOTE_HEIGHT / 2.0),
                 align_y: iced::alignment::Vertical::Center,
                 ..canvas::Text::default()
             };
@@ -42,10 +45,22 @@ impl<Message> canvas::Program<Message> for PianoRollRenderer {
 
             frame.stroke_rectangle(
                 Point::new(0.0, y),
-                Size::new(bounds.size().width, NOTE_HEIGHT.into()),
+                Size::new(bounds.size().width, NOTE_HEIGHT),
                 Stroke::default().with_width(0.25),
             );
         }
+
+        // fix outter line not showing up at 0.25 width
+        let vertical_left_line = Path::line(
+            Point::new(0.0, 0.0),
+            Point::new(0.0, self.track.note_range() as f32 * NOTE_HEIGHT),
+        );
+
+        let horizontal_top_line =
+            Path::line(Point::new(0.0, 0.0), Point::new(bounds.size().width, 0.0));
+
+        frame.stroke(&vertical_left_line, Stroke::default().with_width(0.5));
+        frame.stroke(&horizontal_top_line, Stroke::default().with_width(0.5));
 
         vec![frame.into_geometry()]
     }

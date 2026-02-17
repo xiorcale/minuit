@@ -424,7 +424,7 @@ mod test {
 
     #[test]
     fn parse_midi() {
-        let file = File::new();
+        let file = File::new("./test.mid".to_string());
         let bpm = file.bpm;
         println!("bpm: {bpm}");
 
